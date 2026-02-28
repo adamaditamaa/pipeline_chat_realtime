@@ -102,7 +102,7 @@ services:
       - ./volumes/prefect:/root/.prefect
     
   prefect-worker:
-    image: prefecthq/prefect:3-latest
+    image: prefecthq/prefect:3-python3.11
     container_name: prefect-worker
     restart: always
     volumes:

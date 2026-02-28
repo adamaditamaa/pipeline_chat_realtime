@@ -32,7 +32,7 @@ retry_delay = 10 # in seconds
       retries=retry_count,
       retry_delay_seconds=retry_delay)
 def transform_(logger):
-    dbt.run_dbt(logger=logger,path_folder=DBT_PROJECT_PATH)
+    dbt.run_dbt(logger=logger,path_folder=DBT_PROJECT_PATH,install_deps=True)
     return 'Success Transform'
     
 @flow(log_prints=True)
