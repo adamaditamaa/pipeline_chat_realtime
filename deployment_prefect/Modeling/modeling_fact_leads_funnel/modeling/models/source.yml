@@ -1,0 +1,8 @@
+sources:
+  - name: analytics_source
+    database: chat_db
+    schema: raw_data
+    tables:
+      - name: chat_logs
+
+version: 2

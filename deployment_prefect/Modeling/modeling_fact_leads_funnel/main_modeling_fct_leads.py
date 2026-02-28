@@ -1,13 +1,10 @@
 from prefect import flow, task,get_run_logger
-from prefect.blocks.notifications import DiscordWebhook
-
 
 import os 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from modules import dbt
 import warnings
-import logging
 warnings.filterwarnings("ignore")
 
 ##################################################################################
@@ -20,15 +17,18 @@ folder_main_modeling = 'Modeling'
 folder_modeling = "modeling"
 DBT_PROJECT_PATH = os.path.join(folder_main_modeling,cluster_name,folder_modeling)
 
+# Prefect Config
+retry_count = 1
+retry_delay = 10 # in seconds
 
 ###############################################################################################################################################################
 
-@task(name='Transform Transactions ISP',
+@task(name='Transform Fact Leads Funnel',
       log_prints=True,
       cache_result_in_memory=False,
-      retries=2,
-      retry_delay_seconds=10)
-def transform_transactions_isp(logger):
+      retries=retry_count,
+      retry_delay_seconds=retry_delay)
+def transform_(logger):
     dbt.run_dbt(logger=logger,path_folder=DBT_PROJECT_PATH)
     return 'Success Transform'
     
@@ -36,7 +36,7 @@ def transform_transactions_isp(logger):
 def modeling():
     logger = get_run_logger()
     try:
-        transform_transactions_isp(logger)
+        transform_(logger)
     except Exception as error:
         raise error
 
