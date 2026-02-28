@@ -11,7 +11,7 @@ push: null
 # pull section allows you to provide instructions for cloning this project in remote locations
 
 pull:
-  - prefect.deployments.steps.github_clone:
+  - prefect.deployments.steps.git_clone:
       id: clone-step
       # Gunakan repository_url sesuai hasil inspect
       repository: "{{ prefect.blocks.github-repository.github-repo.repository_url }}"

@@ -112,5 +112,6 @@ services:
       prefect worker start --pool 'default-agent-pool' --type process"
     environment:
       - PREFECT_API_URL=http://prefect-server:4200/api
+      - PYTHONPATH=/opt/prefect/deployment_prefect
     depends_on:
       - prefect-server
