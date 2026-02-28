@@ -13,5 +13,7 @@ push: null
 pull:
   - prefect.deployments.steps.github_clone:
       id: clone-step
-      repository: "{{ prefect.blocks.github-repository.github-repo.repository }}"
+      # Gunakan repository_url sesuai hasil inspect
+      repository: "{{ prefect.blocks.github-repository.github-repo.repository_url }}"
+      # Gunakan access_token dengan memanggil token di dalam credentials
       access_token: "{{ prefect.blocks.github-credentials.github-credential.token }}"
