@@ -1,0 +1,1 @@
+{"postgres_dwh_profile": {"target": "dev", "outputs": {"dev": {"type": "postgres", "host": "dwh_postgres", "user": "user", "password": "password", "port": 5432, "dbname": "chat_db", "schema": "analytics", "threads": 8}}}}

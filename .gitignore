@@ -1,2 +1,4 @@
 volumes/kafka-data
 volumes/zookeeper-data
+.vscode/
+__pycache__/

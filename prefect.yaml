@@ -10,7 +10,7 @@ push: null
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-  - prefect.deployments.steps.git_clone:
+  - prefect.deployments.steps.github_clone:
       id: clone-step
-      repository: "{{ prefect.blocks.gitlab-repository.repo-prefect-gitlab.repository }}"
-      credentials: "{{ prefect.blocks.gitlab-repository.repo-prefect-gitlab.credentials }}"
+      repository: "{{ prefect.blocks.github-repo.github-repo.repository }}"
+      access_token: "{{ prefect.blocks.github-credentials.github-credential.token }}"
