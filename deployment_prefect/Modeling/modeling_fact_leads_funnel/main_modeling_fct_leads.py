@@ -37,6 +37,13 @@ def run_dbt(logger, path_folder, profiles=None, vars_dict=None,install_deps=None
 
     logger.info(f"Using profiles: {profiles}")
         
+    logger.info(f"Checking dbt project path: {path_folder}")
+    if not os.path.exists(path_folder):
+        logger.error(f"Folder NOT FOUND: {path_folder}")
+        logger.info(f"Existing files in this level: {os.listdir(os.path.dirname(path_folder))}")
+    else:
+        logger.info(f"Folder found! Files inside: {os.listdir(path_folder)}")
+
     with tempfile.TemporaryDirectory() as tmpdir:
         profiles_path = os.path.join(tmpdir, "profiles.yml")
         with open(profiles_path, "w") as f:
@@ -78,8 +85,9 @@ main_folder = os.path.dirname(current_script_path)
 folder_main_modeling = 'Modeling'
 folder_modeling = "modeling"
 
+current_folder = Path(__file__).resolve().parent
+DBT_PROJECT_PATH = str(current_folder / "modeling")
 # Jika folder dbt kamu namanya 'modeling' dan ada di dalam folder yang sama dengan main.py:
-DBT_PROJECT_PATH = folder_modeling
 #DBT_PROJECT_PATH = os.path.join(main_folder,folder_main_modeling,cluster_name,folder_modeling)
 
 # Prefect Config
