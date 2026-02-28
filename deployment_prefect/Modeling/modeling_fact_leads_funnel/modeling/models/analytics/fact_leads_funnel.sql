@@ -12,7 +12,7 @@
         (raw.message_data->>'room_id') as room_id
     from raw_data.chat_logs raw
     join pth8tkl5puks7pg.keyword_leads noco 
-        on (raw.message_data->>'message_text') ilike '%' || noco.keyword || '%'
+        on lower(raw.message_data->>'message_text') ilike '%' || noco.keyword || '%'
 ),
 
 room_metrics as (
@@ -44,7 +44,6 @@ room_metrics as (
         end) total_booked,
         sum(coalesce((message_data->'metadata'->'payment_info'->>'amount')::decimal, 0)) as transaction_value
     from raw_data.chat_logs
-    
     where (message_data->>'room_id') in (select room_id from valid_rooms)
     group by 1
 )

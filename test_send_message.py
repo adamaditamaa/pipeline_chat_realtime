@@ -1,86 +1,121 @@
 import requests
 import time
 import uuid
+import random
 from datetime import datetime
 
-URL = "http://localhost:8000/send"
-
-# Skenario Funnel per Room
-def run_simulation(room_id, phone, channel):
-    # 1. Lead Message (Mengandung Keyword sesuai NocoDB)
-    lead_payload = {
-        "room_id": room_id,
-        "sender_phone": phone,
-        "timestamp": datetime.utcnow().isoformat(),
-        "message_text": "Halo, saya tertarik dengan Promo Bundling Seven Retail",
-        "metadata": {
-            "channel": channel,
-            "is_opening": True
-        }
-    }
-    send_msg(lead_payload)
-    time.sleep(1)
-
-    # 2. Chat Tengah (Tanya Jawab Biasa)
-    chat_payload = {
-        "room_id": room_id,
-        "sender_phone": phone,
-        "timestamp": datetime.utcnow().isoformat(),
-        "message_text": "Apakah stoknya masih tersedia untuk wilayah Jakarta?",
-        "metadata": {"channel": channel}
-    }
-    send_msg(chat_payload)
-    time.sleep(1)
-
-    # 3. Booking Message (Memicu booking_date)
-    book_payload = {
-        "room_id": room_id,
-        "sender_phone": phone,
-        "timestamp": datetime.utcnow().isoformat(),
-        "message_text": "Oke saya mau booking satu slot ya",
-        "metadata": {
-            "channel": channel,
-            "booking_info": {
-                "booking_id": f"BK-{uuid.uuid4().hex[:6]}",
-                "status": "confirmed"
-            }
-        }
-    }
-    send_msg(book_payload)
-    time.sleep(1)
-
-    # 4. Transaction Message (Memicu transaction_value)
-    trans_payload = {
-        "room_id": room_id,
-        "sender_phone": "SYSTEM",
-        "timestamp": datetime.utcnow().isoformat(),
-        "message_text": "Pembayaran Sukses!",
-        "metadata": {
-            "channel": channel,
-            "payment_info": {
-                "transaction_id": f"TRX-{uuid.uuid4().hex[:8]}",
-                "amount": 250000,
-                "status": "PAID"
-            }
-        }
-    }
-    send_msg(trans_payload)
+url = "http://localhost:8000/send"
+duration = 80 
 
 def send_msg(payload):
     try:
-        response = requests.post(URL, json=payload)
-        print(f"Sent to {payload['room_id']} | Text: {payload['message_text'][:30]}... | Status: {response.status_code}")
+        response = requests.post(url, json=payload)
+        status = "success" if response.status_code == 200 else f"error {response.status_code}"
+        print(f"sent to {payload['room_id']} | text: {payload['message_text'][:30]}... | status: {status}")
     except Exception as e:
-        print(f"Failed: {e}")
+        print(f"failed: {e}")
 
-# Main Loop: Simulasi untuk 5 Customer berbeda
-channels = ["Instagram Ads", "Google Ads", "Organic", "Facebook"]
-for i in range(5):
-    print(f"\n🚀 Simulating Funnel for Customer {i+1}...")
-    test_room = f"room-retail-{i+100}"
-    test_phone = f"6281299900{i}"
-    test_channel = channels[i % len(channels)]
+def run_complex_simulation(room_id, phone, channel, scenario):
+    # stage 1: lead (mengandung keyword 'Promo' agar valid di query dbt)
+    send_msg({
+        "room_id": room_id,
+        "sender_phone": phone,
+        "timestamp": datetime.utcnow().isoformat(),
+        "message_text": "halo, saya tertarik dengan Promo bundling seven retail",
+        "metadata": {"channel": channel, "is_opening": True}
+    })
+    time.sleep(1)
+
+    if scenario == "lead_only":
+        send_msg({
+            "room_id": room_id,
+            "sender_phone": phone,
+            "timestamp": datetime.utcnow().isoformat(),
+            "message_text": "cuma tanya-tanya dulu ya kak, makasih.",
+            "metadata": {"channel": channel}
+        })
+        return
+
+    # stage 2: booking (menggunakan status 'confirmed' sesuai query dbt)
+    send_msg({
+        "room_id": room_id,
+        "sender_phone": phone,
+        "timestamp": datetime.utcnow().isoformat(),
+        "message_text": "saya mau booking slot promonya",
+        "metadata": {
+            "channel": channel, 
+            "booking_info": {
+                "booking_id": f"bk-{uuid.uuid4().hex[:4]}", 
+                "status": "confirmed"
+            }
+        }
+    })
+    time.sleep(1)
+
+    if scenario == "book_only":
+        send_msg({
+            "room_id": room_id,
+            "sender_phone": phone,
+            "timestamp": datetime.utcnow().isoformat(),
+            "message_text": "nanti saya kabari lagi untuk pembayarannya.",
+            "metadata": {"channel": channel}
+        })
+        return
+
+    # stage 3: transaction (status menggunakan 'PAID' sesuai filter dbt)
+    send_msg({
+        "room_id": room_id,
+        "sender_phone": "system",
+        "timestamp": datetime.utcnow().isoformat(),
+        "message_text": "pembayaran terverifikasi!",
+        "metadata": {
+            "channel": channel,
+            "payment_info": {
+                "transaction_id": f"trx-{uuid.uuid4().hex[:6]}",
+                "amount": random.choice([150000, 250000, 500000]),
+                "status": "PAID"
+            }
+        }
+    })
+
+def run_non_lead(room_id, phone):
+    # pesan ini tidak mengandung keyword 'Promo' sehingga tidak akan ditarik oleh dbt
+    send_msg({
+        "room_id": room_id,
+        "sender_phone": phone,
+        "timestamp": datetime.utcnow().isoformat(),
+        "message_text": random.choice(["p", "cek alamat", "info lokasi", "salah sambung"]),
+        "metadata": {"channel": "Organic", "is_opening": False}
+    })
+
+# eksekusi utama (nama channel disesuaikan dengan format pelaporan)
+channels = ["Facebook", "Organic", "Google Ads", "Instagram Ads"]
+start_time = time.time()
+customer_count = 0
+
+print(f"starting mixed funnel simulation for {duration} seconds")
+
+while (time.time() - start_time) < duration:
+    customer_count += 1
+    current_elapsed = int(time.time() - start_time)
+    test_room = f"room-{uuid.uuid4().hex[:5]}"
+    test_phone = f"62812{str(uuid.uuid4().int)[:8]}"
     
-    run_simulation(test_room, test_phone, test_channel)
+    choice = random.random()
+    
+    if choice < 0.3:
+        print(f"\n[non-lead] customer {customer_count} (elapsed: {current_elapsed}s)")
+        run_non_lead(test_room, test_phone)
+    elif choice < 0.5:
+        print(f"\n[lead-only] customer {customer_count} (elapsed: {current_elapsed}s)")
+        run_complex_simulation(test_room, test_phone, random.choice(channels), "lead_only")
+    elif choice < 0.7:
+        print(f"\n[book-only] customer {customer_count} (elapsed: {current_elapsed}s)")
+        run_complex_simulation(test_room, test_phone, random.choice(channels), "book_only")
+    else:
+        print(f"\n[full-conversion] customer {customer_count} (elapsed: {current_elapsed}s)")
+        run_complex_simulation(test_room, test_phone, random.choice(channels), "full_conversion")
+    
+    time.sleep(2)
 
-print("\n✅ 5 Complete Lead Funnels sent to Kafka")
+print(f"\nsimulation finished. total: {customer_count} customers")

@@ -2,7 +2,6 @@ from prefect import flow, task,get_run_logger
 from prefect.blocks.system import Secret
 
 import os 
-import sys
 from pathlib import Path
 import subprocess
 import tempfile
@@ -80,15 +79,9 @@ def run_dbt(logger, path_folder, profiles=None, vars_dict=None,install_deps=None
 
 # Variable Path
 cluster_name = "modeling_fact_leads_funnel"
-current_script_path = os.path.abspath(__file__)
-main_folder = os.path.dirname(current_script_path)
-folder_main_modeling = 'Modeling'
 folder_modeling = "modeling"
-
 current_folder = Path(__file__).resolve().parent
-DBT_PROJECT_PATH = str(current_folder / "modeling")
-# Jika folder dbt kamu namanya 'modeling' dan ada di dalam folder yang sama dengan main.py:
-#DBT_PROJECT_PATH = os.path.join(main_folder,folder_main_modeling,cluster_name,folder_modeling)
+DBT_PROJECT_PATH = str(current_folder / folder_modeling)
 
 # Prefect Config
 retry_count = 1
