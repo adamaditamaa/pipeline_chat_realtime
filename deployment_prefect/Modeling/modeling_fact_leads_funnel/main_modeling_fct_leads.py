@@ -18,7 +18,7 @@ current_script_path = os.path.abspath(__file__)
 main_folder = os.path.dirname(current_script_path)
 folder_main_modeling = 'Modeling'
 folder_modeling = "modeling"
-DBT_PROJECT_PATH = os.path.join(folder_main_modeling,cluster_name,folder_modeling)
+DBT_PROJECT_PATH = os.path.join(main_folder,folder_main_modeling,cluster_name,folder_modeling)
 
 # Prefect Config
 retry_count = 1
