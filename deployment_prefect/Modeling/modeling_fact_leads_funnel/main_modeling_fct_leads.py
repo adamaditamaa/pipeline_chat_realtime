@@ -2,7 +2,10 @@ from prefect import flow, task,get_run_logger
 
 import os 
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from pathlib import Path
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+root_path = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(root_path))
 from modules import dbt
 import warnings
 warnings.filterwarnings("ignore")
