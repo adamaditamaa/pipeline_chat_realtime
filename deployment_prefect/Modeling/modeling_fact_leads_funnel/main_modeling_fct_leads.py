@@ -51,13 +51,13 @@ def run_dbt(logger, path_folder, profiles=None, vars_dict=None,install_deps=None
         if install_deps:
             exec_dbt([
                 "python", "-m", "dbt.cli.main", "deps",
-                "--project-dir", f"./{path_folder}",
+                "--project-dir", f"{path_folder}",
                 "--profiles-dir", tmpdir
             ])
 
         result_exec = exec_dbt([
             "python", "-m", "dbt.cli.main", "run",
-            "--project-dir", f"./{path_folder}",
+            "--project-dir", f"{path_folder}",
             "--profiles-dir", tmpdir,
             *vars_args
         ])
