@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+kafka-python
+requests
+psycopg2-binary
+dbt-core==1.7.0
+dbt-postgres==1.7.0
