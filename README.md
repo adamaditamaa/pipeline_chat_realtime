@@ -6,18 +6,37 @@ This project is a data engineering pipeline designed to ingest chat data from Ka
 
 ---
 
-## Architecture Decision: Why Kafka?
+## Architecture Decision
+
+### Why Kafka?
 
 While a direct FastAPI-to-Database approach is simpler, this project implements Apache Kafka as a message broker between the ingestion layer and the processing layer for the following reasons:
 
-### 1. Decoupling
+#### 1. Decoupling
 The ingestion API (FastAPI) is separated from the data processing logic. If the database or the dbt transformation fails, Kafka continues to collect and store incoming chat data without losing any records.
 
-### 2. Backpressure Management
+#### 2. Backpressure Management
 During high-traffic marketing campaigns, Kafka acts as a buffer, preventing the database from being overwhelmed by sudden spikes in message volume.
 
-### 3. Scalability
+#### 3. Scalability
 Kafka allows multiple consumers (e.g., analytics, real-time alerts, or archival services) to read the same stream of data independently.
+
+### Why NocoDB instead of Google Sheets?
+
+### Native Database Integration
+NocoDB sits directly on top of our PostgreSQL database. When a user changes a keyword in the NocoDB interface, it updates the actual Postgres table immediately. Google Sheets would require a separate, fragile sync API (like AppScript or Zapier) to move data into our database.
+
+#### Data Type Integrity
+NocoDB enforces strict data types (e.g., specific columns must be dates, numbers, or lookups). Google Sheets is "free-text," meaning a user could accidentally type "Promo123" in a date column, which would break our dbt transformation script.
+
+#### Performance at Scale
+Google Sheets becomes slow and starts lagging once you reach thousands of rows. Since NocoDB is powered by a real SQL database (Postgres), it can handle millions of rows of chat keywords and metadata without any performance drop.
+
+#### Relational Capabilities
+NocoDB allows us to create "Links" between tables (Foreign Keys). For example, we can link a "Keyword" to a specific "Marketing Campaign ID" easily. Doing this in Google Sheets requires complex VLOOKUP formulas that often break.
+
+#### Self-Hosted Security
+Because we host NocoDB on our own Docker infrastructure, the data never leaves our network. With Google Sheets, our business keywords and lead logic are stored on Google's public cloud, which might not comply with some company security policies.
 
 ---
 
