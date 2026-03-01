@@ -17,7 +17,7 @@ def get_producer():
                     bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS"),
                     value_serializer=lambda v: json.dumps(v).encode("utf-8")
                 )
-                print("✅ Connected to Kafka")
+                print("Connected to Kafka")
                 break
             except Exception as e:
                 print("Kafka not ready, retrying in 5 seconds")

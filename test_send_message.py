@@ -16,7 +16,6 @@ def send_msg(payload):
         print(f"failed: {e}")
 
 def run_complex_simulation(room_id, phone, channel, scenario):
-    # stage 1: lead (mengandung keyword 'Promo' agar valid di query dbt)
     send_msg({
         "room_id": room_id,
         "sender_phone": phone,
@@ -36,7 +35,6 @@ def run_complex_simulation(room_id, phone, channel, scenario):
         })
         return
 
-    # stage 2: booking (menggunakan status 'confirmed' sesuai query dbt)
     send_msg({
         "room_id": room_id,
         "sender_phone": phone,
@@ -62,7 +60,6 @@ def run_complex_simulation(room_id, phone, channel, scenario):
         })
         return
 
-    # stage 3: transaction (status menggunakan 'PAID' sesuai filter dbt)
     send_msg({
         "room_id": room_id,
         "sender_phone": "system",
@@ -79,7 +76,6 @@ def run_complex_simulation(room_id, phone, channel, scenario):
     })
 
 def run_non_lead(room_id, phone):
-    # pesan ini tidak mengandung keyword 'Promo' sehingga tidak akan ditarik oleh dbt
     send_msg({
         "room_id": room_id,
         "sender_phone": phone,
@@ -88,7 +84,6 @@ def run_non_lead(room_id, phone):
         "metadata": {"channel": "Organic", "is_opening": False}
     })
 
-# eksekusi utama (nama channel disesuaikan dengan format pelaporan)
 channels = ["Facebook", "Organic", "Google Ads", "Instagram Ads"]
 start_time = time.time()
 customer_count = 0
