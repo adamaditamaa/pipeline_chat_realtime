@@ -1,5 +1,7 @@
 # Real-time Chat Analytics Pipeline
 
+![End-to-End Pipeline](docs/flow_diagram.png)
+
 This project is a data engineering pipeline designed to ingest chat data from Kafka, identify leads based on NocoDB keywords, and process a marketing funnel (leads, booking, and transactions) using Prefect and dbt.
 
 ---
@@ -84,6 +86,8 @@ This project utilizes a single-table approach. The fact_leads_funnel table aggre
 ---
 
 # Access Control and User Management Strategy
+
+![Access Control](docs/access_control.png)
 
 To ensure data security, proper governance, and controlled access across different business functions, this project also defines a structured authorization and user management strategy. The approach combines feature-level permissions with strict data-level restrictions to guarantee that users only access information relevant to their role and responsibility.
 
